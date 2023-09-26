@@ -1,6 +1,7 @@
 const PORT = process.env.PORT || 3001;
 const { animals } = require('./data/animals');
 const express = require('express');
+const res = require('express/lib/response');
 const app = express();
 
 function filterByQuery(query, animalsArray) {
@@ -42,6 +43,11 @@ app.get('/api/animals', (req, res) => {
     console.log(req.query)
 
     res.json(results);
+});
+
+//Add a default route handle for other paths 
+app.get('*', (req, res) => {
+    res.status(404).send("Page not found");
 });
 
 app.listen(PORT, () => {
