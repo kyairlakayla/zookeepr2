@@ -1,3 +1,6 @@
+const fs = require('fs');
+const path = require('path');
+
 const { animals } = require('./data/animals');
 const express = require('express');
 const res = require('express/lib/response');
@@ -69,8 +72,12 @@ function createNewAnimal(body, animalsArray) {
     console.log(body);
     const animal = body;
     animalsArray.push(animal);
-
-    // return finished code to post route for response 
+    
+    fs.writeFileSync(
+        path.join(__dirname, './data/animals.json'),
+        JSON.stringify({ animals: animalsArray }, null, 2)
+    );
+    
     return animal;
 }
 
@@ -79,11 +86,31 @@ app.post('/api/animals', (req, res) => {
     console.log(req.body);
     req.body.id = animals.length.toString();
 
+    if (!validateAnimal(req.body)) {
+        res.status(400).send('The animal is not properly formatted');
+    } else {
+
     // add animal to JSON file and animals array
     const animal = createNewAnimal(req.body, animals);
     res.json(req.body);
+    }
 }); 
 
+function validateAnimal(animal) {
+    if (!animal.name || typeof animal.name !== 'string') {
+        return false;
+    }
+    if (!animal.species || typeof animal.species !== 'string') {
+        return false;
+    }
+    if (!animal.diet || typeof animal.diet !== 'string') {
+        return false;
+    }
+    if (!animal.personalityTraits || !Array.isArray(animal.personalityTraits)) {
+        return false;
+    }
+    return true;
+}
 
 app.listen(PORT, () => {
     console.log('API server now on port ${PORT}!');
