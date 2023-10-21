@@ -4,6 +4,7 @@ const path = require('path');
 const { animals } = require('./data/animals');
 const express = require('express');
 const res = require('express/lib/response');
+const { addAbortSignal } = require('stream');
 const PORT = process.env.PORT || 3001;
 const app = express();
 
@@ -116,3 +117,6 @@ app.listen(PORT, () => {
     console.log('API server now on port ${PORT}!');
 });
 
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, './public/index.html'));
+});
